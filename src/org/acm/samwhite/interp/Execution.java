@@ -44,7 +44,8 @@ public class Execution {
         //execute instructions
         while(true){
             executeInstruction(instructions.get(pc));
-            if(pc == instructions.size()){
+            if((pc == instructions.size()) || pc == -1){
+                //reached the end of the list, or EXIT called
                 break;
             }
         }
@@ -80,6 +81,22 @@ public class Execution {
             } else {
                 pc++;
             }
+        } else if(instruction.equals("SWAP")){
+            //swap two top-most elements of stack
+            int e1 = stack.pop();
+            int e2 = stack.pop();
+            stack.push(e1);
+            stack.push(e2);
+        } else if(instruction.equals("CALL")){
+            //push pc+1 to the top of stack, jump to x
+            stack.push(++pc);
+            pc = i.getArg(0);
+        } else if(instruction.equals("RET")){
+            //pops top value, jumps to it
+            pc = stack.pop();
+        } else if(instruction.equals("EXIT")){
+            //exit program; implemented here as setting pc to -1
+            pc = -1;
         }
 
     }
