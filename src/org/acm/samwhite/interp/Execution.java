@@ -134,22 +134,26 @@ public class Execution {
             int e2 = stack.pop();
             stack.push(e1);
             stack.push(e2);
+            pc++;
         } else if(instruction.equals("CALL")){
             //push pc+1 to the top of stack, jump to x
-            stack.push(++pc);
+            stack.push(pc + 1);
             pc = i.getArgAsInteger();
         } else if(instruction.equals("RET")){
             //pops top value, jumps to it
             pc = stack.pop();
+            pc++;
         } else if(instruction.equals("EXIT")){
             //exit program; implemented here as setting pc to -1
             pc = -1;
         } else if(instruction.equals("DUP")){
             //duplicate top of stack
             stack.push(stack.peek());
+            pc++;
         } else if(instruction.equals("POP")){
             //pop
             stack.pop();
+            pc++;
         }
 
     }
