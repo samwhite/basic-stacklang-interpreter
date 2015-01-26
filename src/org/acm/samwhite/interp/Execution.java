@@ -87,10 +87,7 @@ public class Execution {
             pc++;
         } else if(instruction.equals("ADD")){
             //pop last 2 elements, add together, push result
-            int x = 0;
-            x += stack.pop();
-            x += stack.pop();
-            stack.push(x);
+            stack.push(stack.pop() + stack.pop());
             pc++;
         } else if(instruction.equals("SUB")){
             //pop last 2 elements, substract, push result
@@ -154,6 +151,10 @@ public class Execution {
             //pop
             stack.pop();
             pc++;
+        } else {
+            //illegal instruction
+            System.out.println("Illegal Instruction. Exiting.");
+            System.exit(1);
         }
 
     }
