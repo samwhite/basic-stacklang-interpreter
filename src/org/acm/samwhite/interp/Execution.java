@@ -139,7 +139,6 @@ public class Execution {
         } else if(instruction.equals("RET")){
             //pops top value, jumps to it
             pc = stack.pop();
-            pc++;
         } else if(instruction.equals("EXIT")){
             //exit program; implemented here as setting pc to -1
             pc = -1;
