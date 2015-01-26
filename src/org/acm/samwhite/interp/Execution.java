@@ -4,12 +4,14 @@ import java.io.*;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
+import java.util.HashMap;
 
 
 public class Execution {
     private int pc;
     private ArrayList<Instruction> instructions;
     private Deque<Integer> stack;
+    private HashMap<String, Integer> labels = new HashMap<String, Integer>();
 
     public Execution(File f){
         this.instructions = new ArrayList<Instruction>();
@@ -19,15 +21,41 @@ public class Execution {
         String line;
         try {
             BufferedReader br = new BufferedReader(new FileReader(f));
+            int instructionNumber = 0;
             while ((line = br.readLine()) != null) {
-                // process the line
-                String[] split = line.split("\\s+");
-                String instruction = split[0];
-                int[] arguments = new int[Instruction.MAX_ARGS];
-                for(int i = 1; i < split.length; i++){
-                    arguments[i-1] = Integer.valueOf(split[i]);
+                //check for label
+                //labels will be of the format L1: PRINT (note space)
+                if(line.contains(":")){
+                    String label = line.substring(0, line.indexOf(':'));
+                    labels.put(label, instructionNumber);
+                    //now parse as normal
+                    String s = line.substring(line.indexOf(':') + 2);
+                    //check for arg
+                    if(s.contains(" ")){
+                        //argument
+                        String[] split = s.split("\\s+");
+                        String instruction = split[0];
+                        String argument = split[1];
+                        this.instructions.add(new Instruction(instruction, argument));
+                    } else {
+                        //no arg
+                        this.instructions.add(new Instruction(s, null));
+                    }
+                } else {
+                    //no label, parse normally
+                    //check for arg
+                    if(line.contains(" ")){
+                        //argument
+                        String[] split = line.split("\\s+");
+                        String instruction = split[0];
+                        String argument = split[1];
+                        this.instructions.add(new Instruction(instruction, argument));
+                    } else {
+                        //no arg
+                        this.instructions.add(new Instruction(line, null));
+                    }
                 }
-                this.instructions.add(new Instruction(instruction, arguments));
+                instructionNumber++;
             }
             br.close();
         } catch (FileNotFoundException e){
@@ -55,7 +83,7 @@ public class Execution {
         String instruction = i.getInstruction();
         if(instruction.equals("INT")){
             //add int to stack
-            stack.push(i.getArg(0));
+            stack.push(i.getArgAsInteger());
             pc++;
         } else if(instruction.equals("ADD")){
             //pop last 2 elements, add together, push result
@@ -76,8 +104,14 @@ public class Execution {
             pc++;
         } else if(instruction.equals("JGE")){
             //if peek is >= 0, jump to x, else continue
+            //x may be a label
             if(stack.peek() >= 0){
-                pc = i.getArg(0);
+                if(i.argIsInteger()){
+                    pc = i.getArgAsInteger();
+                } else {
+                    //jump to label x
+                    pc = labels.get(i.getArgAsString());
+                }
             } else {
                 pc++;
             }
@@ -90,7 +124,7 @@ public class Execution {
         } else if(instruction.equals("CALL")){
             //push pc+1 to the top of stack, jump to x
             stack.push(++pc);
-            pc = i.getArg(0);
+            pc = i.getArgAsInteger();
         } else if(instruction.equals("RET")){
             //pops top value, jumps to it
             pc = stack.pop();
