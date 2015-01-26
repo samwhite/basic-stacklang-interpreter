@@ -115,6 +115,19 @@ public class Execution {
             } else {
                 pc++;
             }
+        } else if(instruction.equals("JEQ")) {
+            //if peek is == 0, jump to x, else continue
+            //x may be a label
+            if (stack.peek() == 0) {
+                if (i.argIsInteger()) {
+                    pc = i.getArgAsInteger();
+                } else {
+                    //jump to label x
+                    pc = labels.get(i.getArgAsString());
+                }
+            } else {
+                pc++;
+            }
         } else if(instruction.equals("SWAP")){
             //swap two top-most elements of stack
             int e1 = stack.pop();
@@ -131,6 +144,12 @@ public class Execution {
         } else if(instruction.equals("EXIT")){
             //exit program; implemented here as setting pc to -1
             pc = -1;
+        } else if(instruction.equals("DUP")){
+            //duplicate top of stack
+            stack.push(stack.peek());
+        } else if(instruction.equals("POP")){
+            //pop
+            stack.pop();
         }
 
     }
